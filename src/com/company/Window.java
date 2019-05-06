@@ -45,6 +45,9 @@ public class Window extends JFrame implements Runnable {
 
         s = new Screen((background.getWidth() - getWidth())/2, (background.getHeight() - getHeight())/2, getWidth(), getHeight());
 
+        man = new ImageManager();
+        man.loadImages("Images.txt");
+
         h = new Hero(background.getWidth()/2, background.getHeight()/2, 18, 15, CharID.CharTest, man);
 
         this.addKeyListener(new KeyAdapter() {
@@ -53,16 +56,34 @@ public class Window extends JFrame implements Runnable {
                 super.keyPressed(e);
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_UP:
-                        h.move(0, -5 );
+                        h.up = true;
                         break;
                     case KeyEvent.VK_DOWN:
-                        h.move(0, 5);
+                        h.down = true;
                         break;
                     case KeyEvent.VK_LEFT:
-                        h.move(-5, 0);
+                        h.left = true;
                         break;
                     case KeyEvent.VK_RIGHT:
-                        h.move(5, 0);
+                        h.right = true;
+                        break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_UP:
+                        h.up = false;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        h.down = false;
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        h.left = false;
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        h.right = false;
                         break;
                 }
             }
@@ -70,11 +91,6 @@ public class Window extends JFrame implements Runnable {
 
         anchorX = s.getRect().x;
         anchorY = s.getRect().y;
-
-        man = new ImageManager();
-        man.loadImages("Images.txt");
-
-
 
         test = new Bject(1000, 500, 500, 500);
 
@@ -104,6 +120,50 @@ public class Window extends JFrame implements Runnable {
 
     public void update() {
         frame = (frame + 1) % 35;
+        h.update(frame);
+        scroll(h.rect.x - s.rect.x, h.rect.y - s.rect.y);
+    }
+
+    private void scroll(int rX, int rY) {
+        //System.out.println(rX + " " + rY);
+
+        if(rX < 60) {
+            if(h.left) {
+                if(h.up ^ h.down) {
+                    s.mX((int)(-5 * Math.sqrt(2)));
+                } else {
+                    s.mX(-5);
+                }
+            }
+        }
+        if(rX > 540) {
+            if(h.right) {
+                if(h.up ^ h.down) {
+                    s.mX((int)(5 * Math.sqrt(2)));
+                } else {
+                    s.mX(5);
+                }
+            }
+        }
+
+        if(rY < 40) {
+            if(h.up) {
+                if(h.left ^ h.right) {
+                    s.mY((int)(-5 * Math.sqrt(2)));
+                } else {
+                    s.mY(-5);
+                }
+            }
+        }
+        if(rY > 360) {
+            if(h.down) {
+                if(h.left ^ h.right) {
+                    s.mY((int)(5 * Math.sqrt(2)));
+                } else {
+                    s.mY(5);
+                }
+            }
+        }
     }
 
     public void paint(Graphics g) {
@@ -119,6 +179,7 @@ public class Window extends JFrame implements Runnable {
         }
 
         if(s.isInScreen(h)) {
+            g2.drawImage(h.getImage(h.index), h.rect.x - s.rect.x, h.rect.y - s.rect.y, null);
         }
         g.drawImage(game, 0, 0, null);
     }
