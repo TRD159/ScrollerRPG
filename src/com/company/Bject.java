@@ -2,7 +2,7 @@ package com.company;
 
 import java.awt.*;
 
-public class Bject {
+public class Bject implements Cloneable {
     Rectangle rect;
 
     public Bject() {
@@ -25,5 +25,13 @@ public class Bject {
 
     public boolean contactWith(Bject b) {
         return rect.intersects(b.getRect());
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Bject b = (Bject)super.clone();
+        b.rect = new Rectangle(rect.x, rect.y, rect.width, rect.height);
+
+        return b;
     }
 }

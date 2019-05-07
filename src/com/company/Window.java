@@ -7,10 +7,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.*;
 
 public class Window extends JFrame implements Runnable {
 
-    double TBU = 1000.0/35;
+    int UPS;
+    double TBU;
     int frame = 0;
 
     BufferedImage background;
@@ -19,14 +24,19 @@ public class Window extends JFrame implements Runnable {
 
     int anchorX, anchorY;
 
-    Bject test;
+    Bject test, e;
 
     ImageManager man;
 
     Hero h;
 
-    public Window(String title) throws HeadlessException {
+    Set<Bject> bjects;
+
+    public Window(String title, int UPS) throws HeadlessException {
         super(title);
+
+        this.UPS = UPS;
+        TBU = 1000.0/UPS;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -44,6 +54,8 @@ public class Window extends JFrame implements Runnable {
         }
 
         s = new Screen((background.getWidth() - getWidth())/2, (background.getHeight() - getHeight())/2, getWidth(), getHeight());
+
+        bjects = new HashSet<>();
 
         man = new ImageManager();
         man.loadImages("Images.txt");
@@ -92,12 +104,48 @@ public class Window extends JFrame implements Runnable {
         anchorX = s.getRect().x;
         anchorY = s.getRect().y;
 
-        test = new Bject(1000, 500, 500, 500);
+        test = new Collision(1000, 500, 500, 500);
+        e = new Collision(2000, 250, 300, 50);
+
+        addBjects(new ArrayList<Bject>() {
+            {
+                add(test);
+                add(e);
+            }
+        });
 
         setVisible(true);
 
         Thread t = new Thread(this);
         t.start();
+    }
+
+    private void addBjects(Bject b) {
+        bjects.add(b);
+        h.setBjects(new ArrayList<>() {
+            {
+                try {
+                    for (Bject c : bjects) add((Bject)c.clone());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+            }
+        });
+    }
+
+    private void addBjects(ArrayList<Bject> b) {
+        bjects.addAll(b);
+        h.setBjects(new ArrayList<>() {
+            {
+                try {
+                    for (Bject c : bjects) add((Bject)c.clone());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     @Override
@@ -127,8 +175,11 @@ public class Window extends JFrame implements Runnable {
     private void scroll(int rX, int rY) {
         //System.out.println(rX + " " + rY);
 
-        if(rX < 60) {
-            if(h.left) {
+        int bufferX = getWidth()/5;
+        int bufferY = getHeight()/5;
+
+        if(rX < bufferX) {
+            if(h.left && s.getRect().x > 0) {
                 if(h.up ^ h.down) {
                     s.mX((int)(-5 * Math.sqrt(2)));
                 } else {
@@ -136,8 +187,8 @@ public class Window extends JFrame implements Runnable {
                 }
             }
         }
-        if(rX > 540) {
-            if(h.right) {
+        if(rX > getWidth() - bufferX) {
+            if(h.right && s.rect.x + s.rect.width < background.getWidth()) {
                 if(h.up ^ h.down) {
                     s.mX((int)(5 * Math.sqrt(2)));
                 } else {
@@ -146,8 +197,8 @@ public class Window extends JFrame implements Runnable {
             }
         }
 
-        if(rY < 40) {
-            if(h.up) {
+        if(rY < bufferY) {
+            if(h.up && s.rect.y > 0) {
                 if(h.left ^ h.right) {
                     s.mY((int)(-5 * Math.sqrt(2)));
                 } else {
@@ -155,8 +206,8 @@ public class Window extends JFrame implements Runnable {
                 }
             }
         }
-        if(rY > 360) {
-            if(h.down) {
+        if(rY > getHeight() - bufferY) {
+            if(h.down && s.rect.y + s.rect.height < background.getHeight()) {
                 if(h.left ^ h.right) {
                     s.mY((int)(5 * Math.sqrt(2)));
                 } else {
@@ -174,8 +225,14 @@ public class Window extends JFrame implements Runnable {
         Graphics g2 = game.getGraphics();
         g2.drawImage(background.getSubimage(x, y, getWidth(), getHeight()), 0, 0, null);
 
-        if(s.isInScreen(test)) {
-            g2.fillRect(test.getRect().x - s.getRect().x, test.getRect().y - s.getRect().y, test.getRect().width, test.getRect().height);
+        for(Bject b: bjects) {
+            if(s.isInScreen(b)) {
+                if(b instanceof Collision) {
+                    g2.drawImage(((Collision) b).getImg(), b.rect.x - s.rect.x, b.rect.y - s.rect.y, null);
+                } else {
+                    g2.fillRect(b.getRect().x - s.getRect().x, b.getRect().y - s.getRect().y, b.getRect().width, b.getRect().height);
+                }
+            }
         }
 
         if(s.isInScreen(h)) {

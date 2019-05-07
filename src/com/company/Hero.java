@@ -12,6 +12,8 @@ public class Hero extends Mover {
 
     boolean up, down, left, right;
 
+    ArrayList<Bject> bjects;
+
     public void setIndex(int index) {
         this.index = index;
     }
@@ -25,6 +27,7 @@ public class Hero extends Mover {
         this.id = id;
 
         sprites = new ArrayList<>();
+        bjects = new ArrayList<>();
 
         if(id == CharID.CharTest) {
             for(int i = 0; i < 9; i++) {
@@ -38,30 +41,45 @@ public class Hero extends Mover {
     }
 
     public void move() {
-        int xChange = 0;
-        int yChange = 0;
+        double xChange = 0;
+        double yChange = 0;
 
         if(up)
-            yChange--;
+            yChange-=2;
         else if(down)
-            yChange++;
+            yChange+=2;
 
         if(right)
-            xChange++;
+            xChange+=2;
         else if(left)
-            xChange--;
+            xChange-=2;
 
         if(yChange != 0) {
             if(xChange != 0) {
-                super.move((int)((xChange * 5)/Math.sqrt(2)), (int)((yChange * 5)/Math.sqrt(2)));
+                super.move((int)((xChange)/Math.sqrt(2)), (int)((yChange)/Math.sqrt(2)));
+                for(Bject b: bjects) {
+                    if(contactWith(b) && b instanceof Collision) {
+                        super.move((int)(-(xChange)/Math.sqrt(2)), (int)(-(yChange)/Math.sqrt(2)));
+                    }
+                }
             } else {
-                super.move(0, yChange * 5);
+                super.move(0, (int)yChange);
+                for (Bject b: bjects) {
+                    if(contactWith(b) && b instanceof Collision) {
+                        super.move(0, (int)yChange * -1);
+                    }
+                }
             }
             return;
         }
 
         if(xChange != 0) {
-            super.move(xChange * 5, 0);
+            super.move((int)xChange, 0);
+            for (Bject b: bjects) {
+                if(contactWith(b) && b instanceof Collision) {
+                    super.move((int)xChange * -1, 0);
+                }
+            }
         }
     }
 
@@ -91,5 +109,13 @@ public class Hero extends Mover {
     }
     public BufferedImage getImage(int i) {
         return sprites.get(i % 9);
+    }
+
+    public ArrayList<Bject> getBjects() {
+        return bjects;
+    }
+
+    public void setBjects(ArrayList<Bject> bjects) {
+        this.bjects = bjects;
     }
 }

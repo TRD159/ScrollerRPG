@@ -17,4 +17,8 @@ public class Mover extends Bject {
     public void move(int x, int y) {
         setRect(new Rectangle(getRect().x + x, getRect().y + y, getRect().width, getRect().height));
     }
+
+    public void setCoords(int x, int y) {
+        setRect(new Rectangle(x, y, getRect().width, getRect().height));
+    }
 }
