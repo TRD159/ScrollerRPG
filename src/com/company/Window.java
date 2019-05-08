@@ -22,7 +22,7 @@ public class Window extends JFrame implements Runnable {
 
     Screen s;
 
-    int anchorX, anchorY;
+    double anchorX, anchorY;
 
     Bject test, e;
 
@@ -60,7 +60,7 @@ public class Window extends JFrame implements Runnable {
         man = new ImageManager();
         man.loadImages("Images.txt");
 
-        h = new Hero(background.getWidth()/2, background.getHeight()/2, 18, 15, CharID.CharTest, man);
+        h = new Hero(background.getWidth()/2, background.getHeight()/2, 48, 54, CharID.CharTest, man, 2.0);
 
         this.addKeyListener(new KeyAdapter() {
             @Override
@@ -68,10 +68,6 @@ public class Window extends JFrame implements Runnable {
                 super.keyPressed(e);
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_UP:
-                        h.up = true;
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        h.down = true;
                         break;
                     case KeyEvent.VK_LEFT:
                         h.left = true;
@@ -86,10 +82,7 @@ public class Window extends JFrame implements Runnable {
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_UP:
-                        h.up = false;
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        h.down = false;
+                        h.jump();
                         break;
                     case KeyEvent.VK_LEFT:
                         h.left = false;
@@ -104,7 +97,7 @@ public class Window extends JFrame implements Runnable {
         anchorX = s.getRect().x;
         anchorY = s.getRect().y;
 
-        test = new Collision(1000, 500, 500, 500);
+        test = new Collision(0, 1200, 4000, 500);
         e = new Collision(2000, 250, 300, 50);
 
         addBjects(new ArrayList<Bject>() {
@@ -172,7 +165,7 @@ public class Window extends JFrame implements Runnable {
         scroll(h.rect.x - s.rect.x, h.rect.y - s.rect.y);
     }
 
-    private void scroll(int rX, int rY) {
+    private void scroll(double rX, double rY) {
         //System.out.println(rX + " " + rY);
 
         int bufferX = getWidth()/5;
@@ -181,38 +174,32 @@ public class Window extends JFrame implements Runnable {
         if(rX < bufferX) {
             if(h.left && s.getRect().x > 0) {
                 if(h.up ^ h.down) {
-                    s.mX((int)(-5 * Math.sqrt(2)));
+                    s.mX((int)(-h.speed * Math.sqrt(2)));
                 } else {
-                    s.mX(-5);
+                    s.mX(-h.speed);
                 }
             }
         }
         if(rX > getWidth() - bufferX) {
             if(h.right && s.rect.x + s.rect.width < background.getWidth()) {
                 if(h.up ^ h.down) {
-                    s.mX((int)(5 * Math.sqrt(2)));
+                    s.mX((int)(h.speed * Math.sqrt(2)));
                 } else {
-                    s.mX(5);
+                    s.mX(h.speed);
                 }
             }
         }
 
-        if(rY < bufferY) {
-            if(h.up && s.rect.y > 0) {
-                if(h.left ^ h.right) {
-                    s.mY((int)(-5 * Math.sqrt(2)));
-                } else {
-                    s.mY(-5);
-                }
+        if(rY > getHeight() - bufferY) {
+            if(s.rect.y + s.rect.height < background.getHeight()) {
+                double diff = rY - (getHeight() - bufferY);
+                s.mY((int)diff);
             }
         }
-        if(rY > getHeight() - bufferY) {
-            if(h.down && s.rect.y + s.rect.height < background.getHeight()) {
-                if(h.left ^ h.right) {
-                    s.mY((int)(5 * Math.sqrt(2)));
-                } else {
-                    s.mY(5);
-                }
+        if(rY < bufferY) {
+            if(s.rect.y > 0) {
+                double diff = rY - bufferY;
+                s.mY((int)diff);
             }
         }
     }
@@ -228,15 +215,15 @@ public class Window extends JFrame implements Runnable {
         for(Bject b: bjects) {
             if(s.isInScreen(b)) {
                 if(b instanceof Collision) {
-                    g2.drawImage(((Collision) b).getImg(), b.rect.x - s.rect.x, b.rect.y - s.rect.y, null);
+                    g2.drawImage(((Collision) b).getImg(), (int)(b.rect.x - s.rect.x), (int)(b.rect.y - s.rect.y), null);
                 } else {
-                    g2.fillRect(b.getRect().x - s.getRect().x, b.getRect().y - s.getRect().y, b.getRect().width, b.getRect().height);
+                    g2.fillRect((int)(b.getRect().x - s.getRect().x), (int)(b.getRect().y - s.getRect().y), (int)(b.getRect().width), (int)(b.getRect().height));
                 }
             }
         }
 
         if(s.isInScreen(h)) {
-            g2.drawImage(h.getImage(h.index), h.rect.x - s.rect.x, h.rect.y - s.rect.y, null);
+            g2.drawImage(h.getImage(h.index), (int)(h.rect.x - s.rect.x), (int)(h.rect.y - s.rect.y), null);
         }
         g.drawImage(game, 0, 0, null);
     }

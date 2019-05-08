@@ -2,6 +2,7 @@ package com.company;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -11,7 +12,7 @@ public class Collision extends Bject {
     public Collision() {
     }
 
-    public Collision(Rectangle rect, String fileName) {
+    public Collision(Rectangle2D.Double rect, String fileName) {
         super(rect);
         try {
             img = ImageIO.read(new File(fileName));
@@ -20,15 +21,15 @@ public class Collision extends Bject {
         }
     }
 
-    public Collision(Rectangle rect) {
+    public Collision(Rectangle2D.Double rect) {
         super(rect);
-        img = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
+        img = new BufferedImage((int)rect.width, (int)rect.height, BufferedImage.TYPE_INT_ARGB);
         img.getGraphics().fillRect(0, 0, img.getWidth(), img.getHeight());
     }
 
     public Collision(int x, int y, int w, int h) {
         super(x, y, w, h);
-        img = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
+        img = new BufferedImage((int)rect.width, (int)rect.height, BufferedImage.TYPE_INT_ARGB);
         img.getGraphics().fillRect(0, 0, img.getWidth(), img.getHeight());
     }
 

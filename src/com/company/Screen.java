@@ -1,6 +1,7 @@
 package com.company;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Screen extends Bject{
     public Screen() {
@@ -10,14 +11,14 @@ public class Screen extends Bject{
         super(x, y, w, h);
     }
 
-    public void mX(int i) {
-        int x = (int)getRect().getX();
-        setRect(new Rectangle(x + i, getRect().y, getRect().width, getRect().height));
+    public void mX(double i) {
+        double x = (int)getRect().getX();
+        setRect(new Rectangle2D.Double(x + i, getRect().y, getRect().width, getRect().height));
     }
 
-    public void mY(int i) {
-        int y = getRect().y;
-        setRect(new Rectangle(getRect().x, y + i, getRect().width, getRect().height));
+    public void mY(double i) {
+        double y = getRect().y;
+        setRect(new Rectangle2D.Double(getRect().x, y + i, getRect().width, getRect().height));
     }
 
     public boolean isInScreen(Bject b) {
