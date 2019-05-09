@@ -55,26 +55,33 @@ public class Hero extends Mover {
     }
 
     public void jump() {
-        arial = true;
-        yAccel = -10;
+        if(jumps > 0) {
+            yAccel = -10;
+            jumps--;
+        }
     }
 
     public void move() {
         double xChange = 0;
         double yChange = 0;
 
-        for(Bject b: bjects) {
-            if(contactWith(b) && b.rect.y > rect.y + rect.height)
-                arial = false;
+        for (Bject b : bjects) {
+            if (!(b.rect.y - (rect.y + rect.height) == 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
+                arial = true;
+            }
         }
+        if(arial) {
+            yChange += (yAccel = (yAccel > 5) ? 5 : yAccel + 0.25);
+            //System.out.println(yAccel);
+        }
+
+
 
         if(right)
             xChange+=speed;
         else if(left)
             xChange-=speed;
 
-        if(arial)
-            yChange += (yAccel = (yAccel > 5) ? 5 : yAccel + 0.25);
 
         /*
         if(xChange != 0 && yChange != 0) {
@@ -114,11 +121,23 @@ public class Hero extends Mover {
                 }
             }
         }
+
+        if(arial) {
+            for (Bject b : bjects) {
+                if (Math.abs(b.rect.y - (rect.y + rect.height)) < 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x) {
+                    //System.out.println("contact");
+                    arial = false;
+                    yAccel = 0;
+                    jumps = 2;
+                }
+            }
+        }
     }
 
 
     public void update(int f) {
         move();
+
         int i = f % 35;
         if (i % 2 == 0) {
             if(up)
