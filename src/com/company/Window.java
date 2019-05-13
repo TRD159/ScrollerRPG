@@ -32,6 +32,11 @@ public class Window extends JFrame implements Runnable {
 
     Set<Bject> bjects;
 
+    boolean jump = true;
+    boolean typed = true;
+
+    StringBuilder selected;
+
     public Window(String title, int UPS) throws HeadlessException {
         super(title);
 
@@ -60,14 +65,30 @@ public class Window extends JFrame implements Runnable {
         man = new ImageManager();
         man.loadImages("Images.txt");
 
+        selected = new StringBuilder();
+
         h = new Hero(background.getWidth()/2, background.getHeight()/2, 48, 54, CharID.CharTest, man, 2.0);
 
         this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                char c = Character.toUpperCase(e.getKeyChar());
+                if (c >= 'A' && c <= 'Z') {
+                    selected.append(c);
+                    System.out.println(selected);
+                }
+            }
+
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_UP:
+                        if(jump) {
+                            h.jump();
+                            jump = false;
+                        }
                         break;
                     case KeyEvent.VK_LEFT:
                         h.left = true;
@@ -82,7 +103,7 @@ public class Window extends JFrame implements Runnable {
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_UP:
-                        h.jump();
+                        jump = true;
                         break;
                     case KeyEvent.VK_LEFT:
                         h.left = false;
@@ -91,6 +112,7 @@ public class Window extends JFrame implements Runnable {
                         h.right = false;
                         break;
                 }
+                //char c = Character.toUpperCase((char)e.getKeyCode());
             }
         });
 
