@@ -37,6 +37,8 @@ public class Window extends JFrame implements Runnable {
 
     StringBuilder selected;
 
+    BufferedImage men;
+
     public Window(String title, int UPS) throws HeadlessException {
         super(title);
 
@@ -65,6 +67,8 @@ public class Window extends JFrame implements Runnable {
         man = new ImageManager();
         man.loadImages("Images.txt");
 
+        men = new BufferedImage(100, 200, BufferedImage.TYPE_INT_ARGB);
+
         selected = new StringBuilder();
 
         h = new Hero(background.getWidth()/2, background.getHeight()/2, 48, 54, CharID.CharTest, man, 2.0);
@@ -73,10 +77,13 @@ public class Window extends JFrame implements Runnable {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
-                char c = Character.toUpperCase(e.getKeyChar());
-                if (c >= 'A' && c <= 'Z') {
-                    selected.append(c);
-                    System.out.println(selected);
+                if(typed) {
+                    char c = Character.toUpperCase(e.getKeyChar());
+                    if (c >= 'A' && c <= 'Z') {
+                        selected.append(c);
+                        System.out.println(selected);
+                    }
+                    typed = false;
                 }
             }
 
@@ -84,7 +91,7 @@ public class Window extends JFrame implements Runnable {
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:
+                    case KeyEvent.VK_SPACE:
                         if(jump) {
                             h.jump();
                             jump = false;
@@ -102,7 +109,7 @@ public class Window extends JFrame implements Runnable {
             @Override
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:
+                    case KeyEvent.VK_SPACE:
                         jump = true;
                         break;
                     case KeyEvent.VK_LEFT:
@@ -111,6 +118,11 @@ public class Window extends JFrame implements Runnable {
                     case KeyEvent.VK_RIGHT:
                         h.right = false;
                         break;
+                }
+
+                char c = Character.toUpperCase(e.getKeyChar());
+                if (c >= 'A' && c <= 'Z') {
+                    typed = true;
                 }
                 //char c = Character.toUpperCase((char)e.getKeyCode());
             }
@@ -185,6 +197,11 @@ public class Window extends JFrame implements Runnable {
         frame = (frame + 1) % 35;
         h.update(frame);
         scroll(h.rect.x - s.rect.x, h.rect.y - s.rect.y);
+
+        switch (selected.toString()) {
+            case "ZZ":
+                break;
+        }
     }
 
     private void scroll(double rX, double rY) {
@@ -247,6 +264,9 @@ public class Window extends JFrame implements Runnable {
         if(s.isInScreen(h)) {
             g2.drawImage(h.getImage(h.index), (int)(h.rect.x - s.rect.x), (int)(h.rect.y - s.rect.y), null);
         }
+
+        g2.drawImage(man.getImage("Menu"), 5, 100, 145, 175, 0, 0, 100, 60, null);
+
         g.drawImage(game, 0, 0, null);
     }
 }
