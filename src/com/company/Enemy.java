@@ -2,9 +2,10 @@ package com.company;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Enemy extends Mover {
-    BufferedImage sprite;
+    ArrayList<BufferedImage> sprites;
 
     public Enemy() {
     }

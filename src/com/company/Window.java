@@ -77,14 +77,14 @@ public class Window extends JFrame implements Runnable {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
-                if(typed) {
+                /*if(typed) {
                     char c = Character.toUpperCase(e.getKeyChar());
                     if (c >= 'A' && c <= 'Z') {
                         selected.append(c);
                         System.out.println(selected);
                     }
                     typed = false;
-                }
+                }*/
             }
 
             @Override
@@ -120,10 +120,10 @@ public class Window extends JFrame implements Runnable {
                         break;
                 }
 
-                char c = Character.toUpperCase(e.getKeyChar());
+                /*char c = Character.toUpperCase(e.getKeyChar());
                 if (c >= 'A' && c <= 'Z') {
                     typed = true;
-                }
+                }*/
                 //char c = Character.toUpperCase((char)e.getKeyCode());
             }
         });
@@ -265,7 +265,7 @@ public class Window extends JFrame implements Runnable {
             g2.drawImage(h.getImage(h.index), (int)(h.rect.x - s.rect.x), (int)(h.rect.y - s.rect.y), null);
         }
 
-        g2.drawImage(man.getImage("Menu"), 5, 100, 145, 175, 0, 0, 100, 60, null);
+        //g2.drawImage(man.getImage("Menu"), 5, 100, 145, 175, 0, 0, 100, 60, null);
 
         g.drawImage(game, 0, 0, null);
     }

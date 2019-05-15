@@ -23,7 +23,7 @@ public class Hero extends Mover {
     boolean arial = false;
     boolean jump;
 
-
+    double hp = 100;
 
     public void setIndex(int index) {
         this.index = index;
