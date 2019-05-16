@@ -1,2 +1,2 @@
 SNbL,9,Jim,Jim.png
-single,Menu,Menu.png
+SNbL,3,Goomba,Goomba.png

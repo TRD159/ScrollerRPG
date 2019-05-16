@@ -39,6 +39,8 @@ public class Window extends JFrame implements Runnable {
 
     BufferedImage men;
 
+    ArrayList<Enemy> n;
+
     public Window(String title, int UPS) throws HeadlessException {
         super(title);
 
@@ -72,6 +74,7 @@ public class Window extends JFrame implements Runnable {
         selected = new StringBuilder();
 
         h = new Hero(background.getWidth()/2, background.getHeight()/2, 48, 54, CharID.CharTest, man, 2.0);
+
 
         this.addKeyListener(new KeyAdapter() {
             @Override
@@ -134,12 +137,31 @@ public class Window extends JFrame implements Runnable {
         test = new Collision(0, 1200, 4000, 500);
         e = new Collision(2000, 250, 300, 50);
 
+        n = new ArrayList<>();
+
+
+
+
+        for(int i = 0; i < 8; i++) {
+            n.add(new Enemy((int)(Math.random() * background.getWidth()), (int)(Math.random() * background.getHeight()), 50, 50, man, Enemy.GOOMBA));
+            loop: while (true) {
+                for (Bject b : bjects) {
+                    if (n.get(i).contactWith(b)) {
+                        n.set(i, new Enemy((int)(Math.random() * background.getWidth()), (int)(Math.random() * background.getHeight()), 50, 50, man, Enemy.GOOMBA));
+                        continue loop;
+                    }
+                }
+                break;
+            }
+        }
+
         addBjects(new ArrayList<Bject>() {
             {
                 add(test);
                 add(e);
             }
         });
+
 
         setVisible(true);
 
@@ -149,6 +171,20 @@ public class Window extends JFrame implements Runnable {
 
     private void addBjects(Bject b) {
         bjects.add(b);
+
+        for(int j = 0; j < n.size(); j++) {
+            n.get(j).setBjects(new ArrayList<>() {
+                {
+                    try {
+                        for(Bject c: bjects) add((Bject)c.clone());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+                }
+            });
+        }
+
         h.setBjects(new ArrayList<>() {
             {
                 try {
@@ -159,10 +195,26 @@ public class Window extends JFrame implements Runnable {
                 }
             }
         });
+
     }
 
     private void addBjects(ArrayList<Bject> b) {
         bjects.addAll(b);
+
+        for(int j = 0; j < n.size(); j++) {
+            n.get(j).setBjects(new ArrayList<>() {
+                {
+                    try {
+                        for(Bject c: bjects) add((Bject)c.clone());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+                }
+            });
+            System.out.println(j);
+        }
+
         h.setBjects(new ArrayList<>() {
             {
                 try {
@@ -173,6 +225,8 @@ public class Window extends JFrame implements Runnable {
                 }
             }
         });
+
+
     }
 
     @Override
@@ -197,17 +251,15 @@ public class Window extends JFrame implements Runnable {
         frame = (frame + 1) % 35;
         h.update(frame);
         scroll(h.rect.x - s.rect.x, h.rect.y - s.rect.y);
-
-        switch (selected.toString()) {
-            case "ZZ":
-                break;
+        for(Enemy en: n) {
+            en.update(h, frame);
         }
     }
 
     private void scroll(double rX, double rY) {
         //System.out.println(rX + " " + rY);
 
-        int bufferX = getWidth()/5;
+        int bufferX = getWidth()/2;
         int bufferY = getHeight()/5;
 
         if(rX < bufferX) {
@@ -263,6 +315,12 @@ public class Window extends JFrame implements Runnable {
 
         if(s.isInScreen(h)) {
             g2.drawImage(h.getImage(h.index), (int)(h.rect.x - s.rect.x), (int)(h.rect.y - s.rect.y), null);
+        }
+
+        for(Enemy en: n) {
+            if(s.isInScreen(en)) {
+                g2.drawImage(en.getImage(), (int)(en.rect.x - s.rect.x), (int)(en.rect.y - s.rect.y), null);
+            }
         }
 
         //g2.drawImage(man.getImage("Menu"), 5, 100, 145, 175, 0, 0, 100, 60, null);

@@ -136,6 +136,9 @@ public class Hero extends Mover {
         }
     }
 
+    public void damage(Enemy e) {
+
+    }
 
     public void update(int f) {
         move();
@@ -161,6 +164,8 @@ public class Hero extends Mover {
                 setIndex(3);
         }
     }
+
+
     public BufferedImage getImage(int i) {
         return sprites.get(i % 9);
     }
