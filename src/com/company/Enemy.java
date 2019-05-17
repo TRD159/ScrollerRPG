@@ -29,6 +29,8 @@ public class Enemy extends Mover {
 
     int index;
 
+    double velocity = 0;
+
     public Enemy() {
     }
 
@@ -61,9 +63,11 @@ public class Enemy extends Mover {
         double xChange = 0;
         double yChange = 0;
 
+        arial = true;
         for (Bject b : bjects) {
-            if (!(b.rect.y - (rect.y + rect.height) <= 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
-                arial = true;
+            if ((b.rect.y - (rect.y + rect.height) <= 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
+                arial = false;
+                break;
             }
         }
         if(arial) {
@@ -78,7 +82,7 @@ public class Enemy extends Mover {
         else if(left)
             xChange-=speed;
 
-
+        velocity = Math.sqrt(Math.pow(xChange, 2) + Math.pow(yChange, 2));
         /*
         if(xChange != 0 && yChange != 0) {
             xChange /= Math.sqrt(2);
@@ -134,11 +138,17 @@ public class Enemy extends Mover {
     }
 
     public void update(Hero hero, int f) {
+        double hMidx = hero.rect.x + hero.rect.width/2;
+        double tMidx = rect.x + rect.width/2;
+
+        double hMidy = hero.rect.y + hero.rect.height/2;
+        double tMidy = rect.y + rect.height/2;
         if(type != GOOMBA) {
             targeting = Math.abs((hero.rect.x + hero.rect.width / 2) - (rect.x + rect.width / 2)) < 200
                     && Math.abs((hero.rect.y + hero.rect.height / 2) - (rect.y + rect.height / 2)) < 150;
         } else {
-            targeting = Math.abs((hero.rect.x + hero.rect.width / 2) - (rect.x + rect.width / 2)) < 200;
+            targeting = Math.abs((hero.rect.x + hero.rect.width / 2) - (rect.x + rect.width / 2)) < 200
+                    && Math.abs((hero.rect.y + hero.rect.height / 2) - (rect.y + rect.height / 2)) < 25;
         }
         if(!targeting) {
             if(f == 0) {
@@ -155,6 +165,14 @@ public class Enemy extends Mover {
                     right = false;
                 }
             }
+        } else {
+            if(hMidx < tMidx) {
+                left = true;
+                right = false;
+            } else if(hMidx > tMidx) {
+                right = true;
+                left = false;
+            }
         }
 
 
@@ -162,6 +180,14 @@ public class Enemy extends Mover {
 
         int i = f % 2;
         index = i;
+    }
+
+    public double getHp() {
+        return hp;
+    }
+
+    public void setHp(double hp) {
+        this.hp = hp;
     }
 
     public BufferedImage getImage() {

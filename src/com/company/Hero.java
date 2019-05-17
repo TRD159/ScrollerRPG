@@ -25,6 +25,12 @@ public class Hero extends Mover {
 
     double hp = 100;
 
+    double velocity = 0;
+
+    int fHit = 0;
+
+    DScale d;
+
     public void setIndex(int index) {
         this.index = index;
     }
@@ -54,6 +60,8 @@ public class Hero extends Mover {
 
         jumps = 2;
         jump = true;
+
+        d = DScale.Basic;
     }
 
     public void jump() {
@@ -67,9 +75,11 @@ public class Hero extends Mover {
         double xChange = 0;
         double yChange = 0;
 
+        arial = true;
         for (Bject b : bjects) {
-            if (!(b.rect.y - (rect.y + rect.height) == 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
-                arial = true;
+            if ((b.rect.y - (rect.y + rect.height) == 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
+                arial = false;
+                break;
             }
         }
         if(arial) {
@@ -78,12 +88,13 @@ public class Hero extends Mover {
         }
 
 
-
         if(right)
             xChange+=speed;
         else if(left)
             xChange-=speed;
 
+        velocity = Math.sqrt(Math.pow(xChange, 2) + Math.pow(yChange, 2));
+        //System.out.println(velocity);
 
         /*
         if(xChange != 0 && yChange != 0) {
@@ -126,7 +137,7 @@ public class Hero extends Mover {
 
         if(arial) {
             for (Bject b : bjects) {
-                if (Math.abs(b.rect.y - (rect.y + rect.height)) < 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x) {
+                if (b instanceof Collision && Math.abs(b.rect.y - (rect.y + rect.height)) < 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x) {
                     //System.out.println("contact");
                     arial = false;
                     yAccel = 0;
@@ -134,14 +145,24 @@ public class Hero extends Mover {
                 }
             }
         }
-    }
-
-    public void damage(Enemy e) {
 
     }
 
-    public void update(int f) {
+    public void damage(int j, ArrayList<Enemy> n) {
+        Enemy c = n.get(j);
+        c.setHp(c.getHp() - (d.getScale()));
+    }
+
+    public void update(int f, ArrayList<Enemy> n) {
         move();
+        for(int j = 0; j < n.size(); j++) {
+            if(contactWith(n.get(j))) {
+                damage(j, n);
+                fHit = 20;
+            }
+        }
+        fHit--;
+
 
         int i = f % 35;
         if (i % 2 == 0) {

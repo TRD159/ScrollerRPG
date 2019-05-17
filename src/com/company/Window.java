@@ -24,13 +24,13 @@ public class Window extends JFrame implements Runnable {
 
     double anchorX, anchorY;
 
-    Bject test, e;
+    Collision test, e;
 
     ImageManager man;
 
     Hero h;
 
-    Set<Bject> bjects;
+    Set<Collision> bjects;
 
     boolean jump = true;
     boolean typed = true;
@@ -142,7 +142,7 @@ public class Window extends JFrame implements Runnable {
 
 
 
-        for(int i = 0; i < 8; i++) {
+        /*for(int i = 0; i < 8; i++) {
             n.add(new Enemy((int)(Math.random() * background.getWidth()), (int)(Math.random() * background.getHeight()), 50, 50, man, Enemy.GOOMBA));
             loop: while (true) {
                 for (Bject b : bjects) {
@@ -153,12 +153,31 @@ public class Window extends JFrame implements Runnable {
                 }
                 break;
             }
+        }*/
+
+        for(int i = 0; i < 8; i++) {
+            Enemy e;
+            maker: while (true) {
+                e = new Enemy((int) (Math.random() * background.getWidth()), (int) (Math.random() * background.getHeight()), 50, 50, man, Enemy.GOOMBA);
+                for(Bject b: bjects) {
+                    if(b.contactWith(e)) {
+                        System.out.println(true);
+                        continue maker;
+                    }
+                }
+                break;
+            }
+            n.add(e);
         }
 
-        addBjects(new ArrayList<Bject>() {
+        addBjects(new ArrayList<Collision>() {
             {
                 add(test);
                 add(e);
+                add(new Collision(-50, 0, 50, 1600));
+                add(new Collision(4000, 0, 50, 1600));
+                add(new Collision(0, 750, 1800, 150));
+                add(new Collision(2200, 750, 1800, 150));
             }
         });
 
@@ -169,14 +188,14 @@ public class Window extends JFrame implements Runnable {
         t.start();
     }
 
-    private void addBjects(Bject b) {
+    private void addBjects(Collision b) {
         bjects.add(b);
 
         for(int j = 0; j < n.size(); j++) {
             n.get(j).setBjects(new ArrayList<>() {
                 {
                     try {
-                        for(Bject c: bjects) add((Bject)c.clone());
+                        for(Collision c: bjects) add((Collision)c.clone());
                     } catch (Exception e) {
                         e.printStackTrace();
                         System.exit(0);
@@ -188,7 +207,7 @@ public class Window extends JFrame implements Runnable {
         h.setBjects(new ArrayList<>() {
             {
                 try {
-                    for (Bject c : bjects) add((Bject)c.clone());
+                    for (Collision c : bjects) add((Collision)c.clone());
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(0);
@@ -198,14 +217,14 @@ public class Window extends JFrame implements Runnable {
 
     }
 
-    private void addBjects(ArrayList<Bject> b) {
+    private void addBjects(ArrayList<Collision> b) {
         bjects.addAll(b);
 
         for(int j = 0; j < n.size(); j++) {
             n.get(j).setBjects(new ArrayList<>() {
                 {
                     try {
-                        for(Bject c: bjects) add((Bject)c.clone());
+                        for(Collision c: bjects) add((Collision)c.clone());
                     } catch (Exception e) {
                         e.printStackTrace();
                         System.exit(0);
@@ -218,7 +237,7 @@ public class Window extends JFrame implements Runnable {
         h.setBjects(new ArrayList<>() {
             {
                 try {
-                    for (Bject c : bjects) add((Bject)c.clone());
+                    for (Collision c : bjects) add((Collision)c.clone());
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(0);
@@ -248,8 +267,8 @@ public class Window extends JFrame implements Runnable {
     }
 
     public void update() {
-        frame = (frame + 1) % 35;
-        h.update(frame);
+        frame = (frame + 1);
+        h.update(frame, n);
         scroll(h.rect.x - s.rect.x, h.rect.y - s.rect.y);
         for(Enemy en: n) {
             en.update(h, frame);
