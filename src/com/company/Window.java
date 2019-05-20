@@ -30,7 +30,7 @@ public class Window extends JFrame implements Runnable {
 
     Hero h;
 
-    Set<Collision> bjects;
+    ArrayList<Collision> bjects;
 
     boolean jump = true;
     boolean typed = true;
@@ -64,7 +64,20 @@ public class Window extends JFrame implements Runnable {
 
         s = new Screen((background.getWidth() - getWidth())/2, (background.getHeight() - getHeight())/2, getWidth(), getHeight());
 
-        bjects = new HashSet<>();
+        test = new Collision(0, 1200, 4000, 500);
+        e = new Collision(2000, 250, 300, 50);
+
+        bjects = new ArrayList<Collision>() {
+            {
+                add(test);
+                add(e);
+                add(new Collision(-50, 0, 50, 1600));
+                add(new Collision(4000, 0, 50, 1600));
+                add(new Collision(0, 750, 1800, 150));
+                add(new Collision(2200, 750, 1800, 150));
+            }
+        };
+        System.out.println(bjects);
 
         man = new ImageManager();
         man.loadImages("Images.txt");
@@ -73,7 +86,7 @@ public class Window extends JFrame implements Runnable {
 
         selected = new StringBuilder();
 
-        h = new Hero(background.getWidth()/2, background.getHeight()/2, 48, 54, CharID.CharTest, man, 2.0);
+        h = new Hero(background.getWidth()/2, background.getHeight()/2, 48, 54, CharID.CharTest, man, 2.0, bjects);
 
 
         this.addKeyListener(new KeyAdapter() {
@@ -134,12 +147,8 @@ public class Window extends JFrame implements Runnable {
         anchorX = s.getRect().x;
         anchorY = s.getRect().y;
 
-        test = new Collision(0, 1200, 4000, 500);
-        e = new Collision(2000, 250, 300, 50);
 
         n = new ArrayList<>();
-
-
 
 
         /*for(int i = 0; i < 8; i++) {
@@ -156,30 +165,21 @@ public class Window extends JFrame implements Runnable {
         }*/
 
         for(int i = 0; i < 8; i++) {
-            Enemy e;
+            Enemy d;
             maker: while (true) {
-                e = new Enemy((int) (Math.random() * background.getWidth()), (int) (Math.random() * background.getHeight()), 50, 50, man, Enemy.GOOMBA);
-                for(Bject b: bjects) {
-                    if(b.contactWith(e)) {
+                d = new Enemy((int) (Math.random() * background.getWidth()), (int) (Math.random() * background.getHeight()), 50, 50, man, Enemy.GOOMBA, bjects);
+                for(Collision b: bjects) {
+                    if(b.contactWith(d)) {
                         System.out.println(true);
                         continue maker;
                     }
                 }
                 break;
             }
-            n.add(e);
+            n.add(d);
         }
 
-        addBjects(new ArrayList<Collision>() {
-            {
-                add(test);
-                add(e);
-                add(new Collision(-50, 0, 50, 1600));
-                add(new Collision(4000, 0, 50, 1600));
-                add(new Collision(0, 750, 1800, 150));
-                add(new Collision(2200, 750, 1800, 150));
-            }
-        });
+
 
 
         setVisible(true);

@@ -8,7 +8,7 @@ public class Enemy extends Mover {
     public static final int GOOMBA = 1, KOOPA = 2;
 
     ArrayList<BufferedImage> sprites;
-    ArrayList<Bject> bjects;
+    ArrayList<Collision> bjects;
 
     boolean arial = false;
 
@@ -29,7 +29,7 @@ public class Enemy extends Mover {
 
     int index;
 
-    double velocity = 0;
+    double magnitude = 0;
 
     public Enemy() {
     }
@@ -38,13 +38,13 @@ public class Enemy extends Mover {
         super(rect);
     }
 
-    public Enemy(int x, int y, int w, int h, ImageManager man, int t) {
+    public Enemy(int x, int y, int w, int h, ImageManager man, int t, ArrayList<Collision> bjects) {
         super(x, y, w, h);
         //hero = hr;
 
         type = t;
 
-        bjects = new ArrayList<>();
+        this.bjects = bjects;
 
         sprites = new ArrayList<>();
         switch (t) {
@@ -64,12 +64,12 @@ public class Enemy extends Mover {
         double yChange = 0;
 
         arial = true;
-        for (Bject b : bjects) {
+        /*for (Bject b : bjects) {
             if ((b.rect.y - (rect.y + rect.height) <= 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
                 arial = false;
                 break;
             }
-        }
+        }*/
         if(arial) {
             yChange += (yAccel = (yAccel > 5) ? 5 : yAccel + 0.25);
             //System.out.println(yAccel);
@@ -82,7 +82,7 @@ public class Enemy extends Mover {
         else if(left)
             xChange-=speed;
 
-        velocity = Math.sqrt(Math.pow(xChange, 2) + Math.pow(yChange, 2));
+        magnitude = Math.sqrt(Math.pow(xChange, 2) + Math.pow(yChange, 2));
         /*
         if(xChange != 0 && yChange != 0) {
             xChange /= Math.sqrt(2);
@@ -194,11 +194,11 @@ public class Enemy extends Mover {
         return sprites.get(index);
     }
 
-    public ArrayList<Bject> getBjects() {
+    public ArrayList<Collision> getBjects() {
         return bjects;
     }
 
-    public void setBjects(ArrayList<Bject> bjects) {
+    public void setBjects(ArrayList<Collision> bjects) {
         this.bjects = bjects;
     }
 }

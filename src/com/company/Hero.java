@@ -12,7 +12,7 @@ public class Hero extends Mover {
 
     boolean up, down, left, right;
 
-    ArrayList<Bject> bjects;
+    ArrayList<Collision> bjects;
 
     double speed;
     double falling;
@@ -25,11 +25,14 @@ public class Hero extends Mover {
 
     double hp = 100;
 
-    double velocity = 0;
+    double magnitude = 0;
+    double angle = 0;
 
     int fHit = 0;
 
     DScale d;
+
+    double x, y;
 
     public void setIndex(int index) {
         this.index = index;
@@ -39,12 +42,12 @@ public class Hero extends Mover {
         return index;
     }
 
-    public Hero(int x, int y, int w, int h, CharID id, ImageManager man, double speed) {
+    public Hero(int x, int y, int w, int h, CharID id, ImageManager man, double speed, ArrayList<Collision> bjects) {
         super(x, y, w, h);
         this.id = id;
 
         sprites = new ArrayList<>();
-        bjects = new ArrayList<>();
+        this.bjects = bjects;
 
         if(id == CharID.CharTest) {
             for(int i = 0; i < 9; i++) {
@@ -75,75 +78,89 @@ public class Hero extends Mover {
         double xChange = 0;
         double yChange = 0;
 
-        arial = true;
-        for (Bject b : bjects) {
-            if ((b.rect.y - (rect.y + rect.height) == 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x)) {
-                arial = false;
-                break;
-            }
-        }
-        if(arial) {
-            yChange += (yAccel = (yAccel > 5) ? 5 : yAccel + 0.25);
-            //System.out.println(yAccel);
-        }
+        if(fHit == -11111) {
 
-
-        if(right)
-            xChange+=speed;
-        else if(left)
-            xChange-=speed;
-
-        velocity = Math.sqrt(Math.pow(xChange, 2) + Math.pow(yChange, 2));
-        //System.out.println(velocity);
-
-        /*
-        if(xChange != 0 && yChange != 0) {
-            xChange /= Math.sqrt(2);
-            yChange /= Math.sqrt(2);
-        }*/
-
-        super.move(xChange, 0);
-        for (Bject b: bjects) {
-            if(contactWith(b)) {
-                super.move(-xChange, 0);
-                xChange = 0;
-                break;
-            }
-        }
-
-        if(yChange > 0) {
-            fall: for (; yChange > 0; yChange--) {
-                super.move(0, 1);
-                for (Bject b : bjects) {
-                    if (contactWith(b)) {
-                        super.move(0, -1);
-                        yChange = 0;
-                        break fall;
-                    }
-                }
-            }
         } else {
-            jumping: for (; yChange < 0; yChange++) {
-                super.move(0, -1);
-                for (Bject b : bjects) {
-                    if (contactWith(b)) {
-                        super.move(0, 1);
-                        yChange = 0;
-                        break jumping;
+            /*
+            arial = true;
+            for (Bject b : bjects) {
+                if (Math.abs(b.rect.y - (rect.y + rect.height)) < 2 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x) {
+                    arial = false;
+                    break;
+                }
+            }*/
+            arial = true;
+            if (arial) {
+                yChange += (yAccel = (yAccel > 5) ? 5 : yAccel + 0.25);
+                //System.out.println(yAccel);
+            }
+
+
+            if (right)
+                xChange += speed;
+            else if (left)
+                xChange -= speed;
+
+            magnitude = Math.sqrt(Math.pow(xChange, 2) + Math.pow(yChange, 2));
+            angle = Math.atan2(yChange, xChange);
+            //System.out.println(magnitude);
+
+            if(xChange > 0) {
+                for(; xChange > 0; xChange--) {
+                    super.move(1, 0);
+                    for (Bject b: bjects) {
+                        if(contactWith(b)) {
+                            super.move(-1, 0);
+                            xChange = 0;
+                        }
                     }
                 }
             }
-        }
-
-        if(arial) {
+            super.move(xChange, 0);
             for (Bject b : bjects) {
-                if (b instanceof Collision && Math.abs(b.rect.y - (rect.y + rect.height)) < 1 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x) {
-                    //System.out.println("contact");
-                    arial = false;
-                    yAccel = 0;
-                    jumps = 2;
+                if (contactWith(b)) {
+                    super.move(-xChange, 0);
+                    xChange = 0;
+                    break;
                 }
             }
+
+            if (yChange > 0) {
+                fall:
+                for (; yChange > 0; yChange--) {
+                    super.move(0, 1);
+                    for (Bject b : bjects) {
+                        if (contactWith(b)) {
+                            super.move(0, -1);
+                            yChange = 0;
+                            break fall;
+                        }
+                    }
+                }
+            } else {
+                jumping:
+                for (; yChange < 0; yChange++) {
+                    super.move(0, -1);
+                    for (Bject b : bjects) {
+                        if (contactWith(b)) {
+                            super.move(0, 1);
+                            yChange = 0;
+                            break jumping;
+                        }
+                    }
+                }
+            }
+
+            if (arial) {
+                for (Bject b : bjects) {
+                    if (b instanceof Collision && Math.abs(b.rect.y - (rect.y + rect.height)) < 2 && b.rect.x < (rect.x + rect.width) && b.rect.x + b.rect.width > rect.x) {
+                        arial = false;
+                        yAccel = 0;
+                        jumps = 2;
+                    }
+                }
+            }
+            System.out.println(jumps);
         }
 
     }
@@ -151,6 +168,20 @@ public class Hero extends Mover {
     public void damage(int j, ArrayList<Enemy> n) {
         Enemy c = n.get(j);
         c.setHp(c.getHp() - (d.getScale()));
+        double cent = rect.x + rect.width/2;
+        double eCent = c.getRect().x + c.getRect().width/2;
+
+        if(cent == eCent) {
+            if(left) {
+                x = -3;
+            } else {
+                x = 3;
+            }
+        } else if(cent < eCent) {
+            x = -3;
+        } else {
+            x = 3;
+        }
     }
 
     public void update(int f, ArrayList<Enemy> n) {
@@ -158,7 +189,7 @@ public class Hero extends Mover {
         for(int j = 0; j < n.size(); j++) {
             if(contactWith(n.get(j))) {
                 damage(j, n);
-                fHit = 20;
+                fHit = 31;
             }
         }
         fHit--;
@@ -191,11 +222,11 @@ public class Hero extends Mover {
         return sprites.get(i % 9);
     }
 
-    public ArrayList<Bject> getBjects() {
+    public ArrayList<Collision> getBjects() {
         return bjects;
     }
 
-    public void setBjects(ArrayList<Bject> bjects) {
+    public void setBjects(ArrayList<Collision> bjects) {
         this.bjects = bjects;
     }
 
